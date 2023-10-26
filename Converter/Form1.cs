@@ -25,25 +25,25 @@ namespace Converter
         }
         private void ConvertButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(inputPath.Text) || string.IsNullOrEmpty(savePath.Text))
+            // Extract the directory from the input XML file path
+            string directoryPath = Path.GetDirectoryName(openFileDialog.FileName);
+            using (saveFileDialog)
+            {
+                saveFileDialog.Filter = "PDF Files (*.pdf)|*.pdf";
+                saveFileDialog.InitialDirectory = directoryPath;
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    savePath.Text = saveFileDialog.FileName;
+                }
+            }
+            if (string.IsNullOrEmpty(openFileDialog.FileName) || string.IsNullOrEmpty(saveFileDialog.FileName))
             {
                 MessageBox.Show("Please provide input XML and output PDF file paths.", "Error");
                 return;
             }
             else
             {
-                // Extract the directory from the input XML file path
-                string directoryPath = Path.GetDirectoryName(inputPath.Text);
-                using (saveFileDialog)
-                {
-                    saveFileDialog.Filter = "PDF Files (*.pdf)|*.pdf";
-                    saveFileDialog.InitialDirectory = directoryPath;
-
-                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        savePath.Text = saveFileDialog.FileName;
-                    }
-                }
                 DeserializeJson(inputPath.Text);
             }
             // Deserialize the outer object to get the "document" property as a string
@@ -62,7 +62,7 @@ namespace Converter
             DocumentModel? document = JsonConvert.DeserializeObject<DocumentModel>(invoiceData.document);
             if (invoiceData != null && document != null)
             {
-                CreatePdf(invoiceData, document, savePath.Text);
+                CreatePdf(invoiceData, document, saveFileDialog.FileName);
             }
             else
             {
