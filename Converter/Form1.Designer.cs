@@ -29,11 +29,12 @@
         private void InitializeComponent()
         {
             label1 = new Label();
-            button1 = new Button();
-            textBox1 = new TextBox();
-            openFileDialog1 = new OpenFileDialog();
+            browseButton = new Button();
+            inputPath = new TextBox();
             ConvertButton = new Button();
-            textBox2 = new TextBox();
+            savePath = new TextBox();
+            openFileDialog = new OpenFileDialog();
+            saveFileDialog = new SaveFileDialog();
             SuspendLayout();
             // 
             // label1
@@ -48,33 +49,29 @@
             label1.TabIndex = 0;
             label1.Text = "Enter Xml File";
             // 
-            // button1
+            // browseButton
             // 
-            button1.Location = new Point(352, 106);
-            button1.Margin = new Padding(4, 3, 4, 3);
-            button1.Name = "button1";
-            button1.Size = new Size(148, 27);
-            button1.TabIndex = 1;
-            button1.Text = "browse";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            browseButton.Location = new Point(352, 106);
+            browseButton.Margin = new Padding(4, 3, 4, 3);
+            browseButton.Name = "browseButton";
+            browseButton.Size = new Size(148, 27);
+            browseButton.TabIndex = 1;
+            browseButton.Text = "browse";
+            browseButton.UseVisualStyleBackColor = true;
+            browseButton.Click += browseButton_Click;
             // 
-            // textBox1
+            // inputPath
             // 
-            textBox1.BackColor = SystemColors.Control;
-            textBox1.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            textBox1.ForeColor = Color.DimGray;
-            textBox1.Location = new Point(41, 110);
-            textBox1.Margin = new Padding(4, 3, 4, 3);
-            textBox1.Name = "textBox1";
-            textBox1.ReadOnly = true;
-            textBox1.Size = new Size(259, 25);
-            textBox1.TabIndex = 4;
-            textBox1.Text = "Filepath...";
-            // 
-            // openFileDialog1
-            // 
-            openFileDialog1.FileName = "openFileDialog1";
+            inputPath.BackColor = SystemColors.Control;
+            inputPath.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            inputPath.ForeColor = Color.DimGray;
+            inputPath.Location = new Point(41, 110);
+            inputPath.Margin = new Padding(4, 3, 4, 3);
+            inputPath.Name = "inputPath";
+            inputPath.ReadOnly = true;
+            inputPath.Size = new Size(259, 25);
+            inputPath.TabIndex = 4;
+            inputPath.Text = "Filepath...";
             // 
             // ConvertButton
             // 
@@ -89,18 +86,18 @@
             ConvertButton.UseVisualStyleBackColor = true;
             ConvertButton.Click += ConvertButton_Click;
             // 
-            // textBox2
+            // savePath
             // 
-            textBox2.BackColor = SystemColors.Control;
-            textBox2.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            textBox2.ForeColor = Color.DimGray;
-            textBox2.Location = new Point(41, 140);
-            textBox2.Margin = new Padding(4, 3, 4, 3);
-            textBox2.Name = "textBox2";
-            textBox2.ReadOnly = true;
-            textBox2.Size = new Size(332, 25);
-            textBox2.TabIndex = 4;
-            textBox2.Text = "SaveLocation...";
+            savePath.BackColor = SystemColors.Control;
+            savePath.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            savePath.ForeColor = Color.DimGray;
+            savePath.Location = new Point(41, 140);
+            savePath.Margin = new Padding(4, 3, 4, 3);
+            savePath.Name = "savePath";
+            savePath.ReadOnly = true;
+            savePath.Size = new Size(332, 25);
+            savePath.TabIndex = 4;
+            savePath.Text = "SaveLocation...";
             // 
             // Form1
             // 
@@ -108,17 +105,16 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
             ClientSize = new Size(611, 390);
-            Controls.Add(textBox2);
+            Controls.Add(savePath);
             Controls.Add(ConvertButton);
-            Controls.Add(textBox1);
-            Controls.Add(button1);
+            Controls.Add(inputPath);
+            Controls.Add(browseButton);
             Controls.Add(label1);
             Margin = new Padding(4, 3, 4, 3);
             MaximumSize = new Size(900, 900);
             MinimumSize = new Size(500, 400);
             Name = "Form1";
             Text = "Form1";
-            Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -126,11 +122,12 @@
         #endregion
 
         private Label label1;
-        private Button button1;
-        private TextBox textBox1;
-        private OpenFileDialog openFileDialog1;
+        private Button browseButton;
+        private TextBox inputPath;
         private Button ConvertButton;
-        private TextBox textBox2;
+        private TextBox savePath;
+        private OpenFileDialog openFileDialog;
+        private SaveFileDialog saveFileDialog;
     }
 }
 

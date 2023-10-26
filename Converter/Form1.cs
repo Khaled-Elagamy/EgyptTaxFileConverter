@@ -3,51 +3,49 @@ using iTextSharp.text.pdf;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
+
 namespace Converter
 {
     public partial class Form1 : Form
     {
+
         public Form1()
         {
             InitializeComponent();
+
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void browseButton_Click(object sender, EventArgs e)
         {
-            OpenFileDialog filedialog = new OpenFileDialog();
-            filedialog.Filter = "JSON Files (*.json)|*.json|XML Files (*.xml)|*.xml";
-            if (filedialog.ShowDialog() == DialogResult.OK)
+            openFileDialog.Filter = "JSON Files (*.json)|*.json|XML Files (*.xml)|*.xml";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                textBox1.Text = filedialog.FileName;
-                string xmlFilePath = filedialog.FileName;
-
+                inputPath.Text = openFileDialog.FileName;
+            }
+        }
+        private void ConvertButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(inputPath.Text) || string.IsNullOrEmpty(savePath.Text))
+            {
+                MessageBox.Show("Please provide input XML and output PDF file paths.", "Error");
+                return;
+            }
+            else
+            {
                 // Extract the directory from the input XML file path
-                string directoryPath = Path.GetDirectoryName(xmlFilePath);
-
-                using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                string directoryPath = Path.GetDirectoryName(inputPath.Text);
+                using (saveFileDialog)
                 {
                     saveFileDialog.Filter = "PDF Files (*.pdf)|*.pdf";
                     saveFileDialog.InitialDirectory = directoryPath;
 
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        textBox2.Text = saveFileDialog.FileName;
+                        savePath.Text = saveFileDialog.FileName;
                     }
-
                 }
+                DeserializeJson(inputPath.Text);
             }
-        }
-
-        private void ConvertButton_Click(object sender, EventArgs e)
-        {
-            string xmlFilePath = textBox1.Text;
-            string pdfFilePath = textBox2.Text;
-            if (string.IsNullOrEmpty(xmlFilePath) || string.IsNullOrEmpty(pdfFilePath))
-            {
-                MessageBox.Show("Please provide input XML and output PDF file paths.", "Error");
-                return;
-            }
-            string jsonString = File.ReadAllText(xmlFilePath, Encoding.UTF8);
             // Deserialize the outer object to get the "document" property as a string
             //var outerObject = JsonConvert.DeserializeObject<OuterObject>(jsonString);
 
@@ -56,10 +54,25 @@ namespace Converter
 
             // Now you can work with the embedded JSON object
             //var invoiceData = documentObject.ToObject<InvoiceModel>();
-
+        }
+        private void DeserializeJson(string jsonFilePath)
+        {
+            string jsonString = File.ReadAllText(jsonFilePath, Encoding.UTF8);
             var invoiceData = JsonConvert.DeserializeObject<InvoiceModel>(jsonString);
             DocumentModel? document = JsonConvert.DeserializeObject<DocumentModel>(invoiceData.document);
+            if (invoiceData != null && document != null)
+            {
+                CreatePdf(invoiceData, document, savePath.Text);
+            }
+            else
+            {
+                MessageBox.Show("The File has Wrong Format.", "Error");
+                return;
+            }
+        }
 
+        private void CreatePdf(InvoiceModel invoiceData, DocumentModel document, string pdfFilePath)
+        {
             using (Document pdfDocument = new Document())
             {
                 PdfWriter writer = PdfWriter.GetInstance(pdfDocument, new FileStream(pdfFilePath, FileMode.Create));
@@ -124,19 +137,19 @@ namespace Converter
 
 
 
+
+
         /*
+      try
+      {
+      CreatePdf(pdfFilePath, xmlFilePath);
 
-
-try
-{
-   CreatePdf(pdfFilePath, xmlFilePath);
-
-   MessageBox.Show($"PDF successfully generated as {pdfFilePath}", "Success");
-}
-catch (Exception ex)
-{
-   MessageBox.Show($"An error occurred: {ex.Message}", "Error");
-}*/
+      MessageBox.Show($"PDF successfully generated as {pdfFilePath}", "Success");
+      }
+      catch (Exception ex)
+      {
+      MessageBox.Show($"An error occurred: {ex.Message}", "Error");
+      }*/
 
 
 
