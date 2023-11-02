@@ -61,6 +61,7 @@
             color: #333;
             padding: 5px;
             margin-bottom: 50px;
+            font-weight: 700 !important;
         }
 
         .customer-block {
@@ -142,7 +143,7 @@
                     {{D.taxpayerActivityCode}}
                 </div>
                 {{I.issuerId}} # رقم التسجيل <br>
-                فرع رقم:{{D.issuer.address.branchID}},
+                رقم الفرع:{{D.issuer.address.branchID}},
                 {{D.issuer.address.street}},
                 {{D.issuer.address.governate}},{{D.issuer.address.postalCode}}<br>
                 {{D.issuer.address.country}},{{D.issuer.address.regionCity}}
@@ -152,8 +153,8 @@
             <div class="border-box-header">
 
                 <div style="float:left;">
-                    {{}} :رقم الفاتورة المبدئية للتصدير<br>
-                    {{}} :رقم أمر البيع <br>
+                    {{s}} :رقم الفاتورة المبدئية للتصدير<br>
+                    {{s}} :رقم أمر البيع <br>
                 </div>
                 {{I.uuid}}
                 <b>: الرقم الالكتروني</b><br>

@@ -1,34 +1,40 @@
-﻿using iTextSharp.text;
-using iTextSharp.text.pdf;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Nustache.Core;
-using System.Diagnostics;
 using System.Dynamic;
 using System.Reflection;
 using System.Text;
 namespace Converter
 {
-
     public partial class Form1 : Form
     {
+        private string template_path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\template.html";
 
         public Form1()
         {
             InitializeComponent();
-
         }
-
         private void browseButton_Click(object sender, EventArgs e)
         {
-            openFileDialog.Filter = "JSON Files (*.json)|*.json|XML Files (*.xml)|*.xml";
+            openFileDialog.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            //openFileDialog.Filter = "JSON Files (*.json)|*.json|XML Files (*.xml)|*.xml";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 inputPath.Text = openFileDialog.FileName;
+                label1.Text = "The Pdf file will be created using the Template html";
+                label1.ForeColor = SystemColors.ControlText;
+                label1.BackColor = SystemColors.ActiveCaptionText;
+                label1.Show();
+                label2.Show();
             }
+
+        }
+        private void label2_Click(object sender, EventArgs e)
+        {
+            Get_html_file();
         }
         private void ConvertButton_Click(object sender, EventArgs e)
         {
-            // Extract the directory from the input XML file path
+            Check_Tempelate(template_path);
             string directoryPath = Path.GetDirectoryName(openFileDialog.FileName);
             using (saveFileDialog)
             {
@@ -39,24 +45,47 @@ namespace Converter
                 {
                     savePath.Text = saveFileDialog.FileName;
                 }
+                else { return; }
             }
             if (string.IsNullOrEmpty(openFileDialog.FileName) || string.IsNullOrEmpty(saveFileDialog.FileName))
             {
-                MessageBox.Show("Please provide input XML and output PDF file paths.", "Error");
+                MessageBox.Show("Please provide input Json and output PDF file paths.", "Error");
                 return;
             }
             else
             {
                 DeserializeJson(inputPath.Text);
             }
-            // Deserialize the outer object to get the "document" property as a string
-            //var outerObject = JsonConvert.DeserializeObject<OuterObject>(jsonString);
+        }
+        private void Check_Tempelate(string template_path)
+        {
+            if (template_html.FileName == "" && File.Exists(template_path))
+            {
+                template_html.FileName = template_path;
+            }
+            else if (!File.Exists(template_path))
+            {
+                MessageBox.Show("The HtmlTemplate file does not exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                label1.Text = "Can't find file" + template_path;
+                label2.Text = "Click to Choose File";
+                Get_html_file();
+            }
 
-            // Parse the embedded JSON within the "document" property
-            //var documentObject = JObject.Parse(outerObject.Document);
-
-            // Now you can work with the embedded JSON object
-            //var invoiceData = documentObject.ToObject<InvoiceModel>();
+        }
+        private void Get_html_file()
+        {
+            using (template_html)
+            {
+                template_html.Filter = "Html files (*.html)|*.html";
+                //openFileDialog.Filter = "JSON Files (*.json)|*.json|XML Files (*.xml)|*.xml";
+                if (template_html.ShowDialog() == DialogResult.OK)
+                {
+                    string selectedFileName = Path.GetFileName(template_html.FileName);
+                    template_path = template_html.FileName;
+                    label1.Text = "Creating Pdf File using " + selectedFileName;
+                    label2.Text = "Click here to change the file";
+                }
+            }
         }
         private void DeserializeJson(string jsonFilePath)
         {
@@ -66,10 +95,7 @@ namespace Converter
             invoiceData.Documents = document;
             if (invoiceData != null && document != null)
             {
-                //CreatePdf(invoiceData, document, saveFileDialog.FileName);
-                string template = "F:\\code learning\\projects\\Converter\\Converter\\template.html";
-                //FillPdfTemplate(template, saveFileDialog.FileName, invoiceData.uuid, document?.issuer.name);
-                htmltopdf(template, saveFileDialog.FileName, invoiceData, document);
+                htmltopdf(template_html.FileName, saveFileDialog.FileName, invoiceData, document);
             }
             else
             {
@@ -150,26 +176,24 @@ namespace Converter
                     writer.WriteLine($"{property.Name}: {value}");
                 }
             }
-
-
-
-            // Load your HTML template with placeholders
-            string htmlTemplate = File.ReadAllText(templatePath);
-            string renderedHtml = Render.StringToString(htmlTemplate, combinedData);
-
-            // Replace placeholders in the HTML template with actual data
-            /*
-                htmlTemplate = htmlTemplate.Replace("{{InvoiceNumber}}", invoiceData.InvoiceNumber);
-                htmlTemplate = htmlTemplate.Replace("{{CustomerName}}", invoiceData.CustomerName);
-                htmlTemplate = htmlTemplate.Replace("{{CustomerName}}", invoiceData.CustomerName);
-                htmlTemplate = htmlTemplate.Replace("{{CustomerName}}", invoiceData.CustomerName);
-                htmlTemplate = htmlTemplate.Replace("{{CustomerName}}", invoiceData.CustomerName);
-            */
-            // Add more replacements as needed
-
-            // Create a PDF document from the HTML content
-            PdfGenerator.GeneratePdf(renderedHtml, outputPath);
+            try
+            {
+                string htmlTemplate = File.ReadAllText(templatePath);
+                string renderedHtml = Render.StringToString(htmlTemplate, combinedData);
+                PdfGenerator.GeneratePdf(renderedHtml, outputPath);
+                savePath.Clear();
+                saveFileDialog.FileName = null;
+                label1.Text = "File Created successfully";
+                label1.ForeColor = Color.Black;
+                label1.BackColor = Color.Green;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error reading the file: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
+
 
         /*private void CreateJson()
         {
@@ -214,117 +238,6 @@ namespace Converter
             }
         }
         */
-        private void CreatePdf(InvoiceModel invoiceData, DocumentModel document, string pdfFilePath)
-        {
-            using (Document pdfDocument = new Document())
-            {
-                PdfWriter writer = PdfWriter.GetInstance(pdfDocument, new FileStream(pdfFilePath, FileMode.Create));
-                pdfDocument.Open();
-
-                //BaseFont baseFont = BaseFont.CreateFont("c:\\windows\\fonts\\arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-
-                // Create the font for Arabic text
-                iTextSharp.text.Font arabicFont = GetArial();
-
-                // Create a new paragraph to add text
-                Paragraph paragraph = new Paragraph();
-                paragraph.Alignment = Element.ALIGN_LEFT;
-
-                // Add text to the paragraph
-                paragraph.Add(new Chunk("Invoice Data:" + invoiceData.dateTimeIssued, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 12, iTextSharp.text.Font.BOLD)));
-                paragraph.Add(Chunk.NEWLINE);
-                paragraph.Add(new Chunk("Invoice Number: " + invoiceData.uuid, GetArial()));
-
-                // Add the paragraph to the document
-                pdfDocument.Add(paragraph);
-
-                ColumnText ct = new ColumnText(writer.DirectContent);
-                ct.RunDirection = PdfWriter.RUN_DIRECTION_RTL; // Set text direction to RTL
-                ct.SetSimpleColumn(100, 200, 400, 750); // Adjust the coordinates as needed
-
-                // Create a Phrase with Arabic text
-                Phrase arabicPhrase = new Phrase(new Chunk("Customer Name: " + document?.issuer.name, arabicFont));
-
-                // Add the Phrase to the ColumnText
-                ct.AddText(arabicPhrase);
-
-                // Go to add the text to the document
-                ct.Go();
-
-                // Close the document
-                pdfDocument.Close();
-                MessageBox.Show($"PDF successfully generated as {pdfFilePath}", "Success");
-                try
-                {
-                    // Use Process.Start to open the File Explorer at the specified path
-                    Process.Start("explorer.exe", pdfFilePath);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-        public static iTextSharp.text.Font GetArial()
-        {
-            string fontName = "arial";
-            if (!FontFactory.IsRegistered(fontName))
-            {
-                var fontPath = Environment.GetEnvironmentVariable("SystemRoot") + "\\fonts\\arial.ttf";
-                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                FontFactory.Register(fontPath, fontName);
-            }
-            //new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 12, iTextSharp.text.Font.BOLD)
-            return FontFactory.GetFont(fontName, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 10);
-        }
-
-        public void FillPdfTemplate(string templatePath, string outputPath, string invoiceNumber, string customerName)
-        {
-            using (var pdfReader = new PdfReader(templatePath))
-            using (var pdfStream = new FileStream(outputPath, FileMode.Create))
-            using (var pdfStamper = new PdfStamper(pdfReader, pdfStream))
-            {
-                BaseFont baseFont = BaseFont.CreateFont(":\\windows\\fonts\\arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-
-                var pdfFormFields = pdfStamper.AcroFields;
-                pdfFormFields.SetFieldProperty("InvoiceNumber", "textfont", baseFont, null);
-                pdfFormFields.SetFieldProperty("CustomerName", "textfont", baseFont, null);
-                // Replace placeholders in the PDF template with actual data
-                pdfFormFields.SetField("InvoiceNumber", invoiceNumber);
-                pdfFormFields.SetField("customerName", customerName);
-
-                // Flatten the PDF so the data is no longer editable
-                pdfStamper.FormFlattening = true;
-            }
-        }
-        public void fillablePdf()
-        {
-            // Create a new document
-            using (Document doc = new Document())
-            {
-                PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream("fillable_form.pdf", FileMode.Create));
-                doc.Open();
-
-                // Create a text field
-                TextField textField = new TextField(writer, new iTextSharp.text.Rectangle(100, 500, 200, 520), "text_field");
-                textField.Alignment = Element.ALIGN_LEFT;
-                textField.FontSize = 12f;
-                PdfFormField textFormField = textField.GetTextField();
-                textFormField.SetFieldFlags(PdfFormField.FF_MULTILINE);
-                writer.AddAnnotation(textFormField);
-
-                // Close the document
-                doc.Close();
-            }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            fillablePdf();
-        }
-
-
-
         /*
       try
       {

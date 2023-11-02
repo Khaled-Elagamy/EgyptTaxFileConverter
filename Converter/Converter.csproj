@@ -13,7 +13,7 @@
 		<PackageReference Include="DinkToPdf" Version="1.0.8" />
 		<PackageReference Include="iTextSharp" Version="5.5.13.3" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="NuGet.Frameworks" Version="4.7.3" />
+		<PackageReference Include="NuGet.Frameworks" Version="6.7.0" />
 		<PackageReference Include="Nustache" Version="1.16.0.10" />
 		<PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
 		<PackageReference Include="System.Text.Encoding" Version="4.3.0" />
