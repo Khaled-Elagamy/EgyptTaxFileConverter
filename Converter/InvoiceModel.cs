@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Converter
+﻿namespace Converter
 {
     public class Address
     {
@@ -38,7 +32,8 @@ namespace Converter
         public string swiftCode { get; set; }
         public string terms { get; set; }
     }
-    public class Delivery {
+    public class Delivery
+    {
         public string approach { get; set; }
         public string packaging { get; set; }
         public DateTime dateValidity { get; set; }
@@ -48,7 +43,7 @@ namespace Converter
         public double netWeight { get; set; }
         public string terms { get; set; }
     }
-   
+
 
     public class UnitValue
     {
@@ -96,11 +91,7 @@ namespace Converter
         public string taxType { get; set; }
         public double amount { get; set; }
     }
-    public class OuterObject
-    {
-        public string Document { get; set; }
-    }
-   
+
     public class DocumentModel
     {
         public Issuer issuer { get; set; }
@@ -127,7 +118,7 @@ namespace Converter
         public double totalItemsDiscountAmount { get; set; }
     }
 
-  
+
 
     public class InvoiceModel
     {
@@ -154,6 +145,7 @@ namespace Converter
         public ValidationResults validationResults { get; set; }
         public int maxPercision { get; set; }
         public List<InvoiceLineItemCode> invoiceLineItemCodes { get; set; }
+        public DocumentModel Documents { get; set; }
     }
 
     public class ValidationResults

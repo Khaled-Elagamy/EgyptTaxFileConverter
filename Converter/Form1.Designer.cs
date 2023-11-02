@@ -35,6 +35,7 @@
             savePath = new TextBox();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
+            button1 = new Button();
             SuspendLayout();
             // 
             // label1
@@ -99,12 +100,23 @@
             savePath.TabIndex = 4;
             savePath.Text = "SaveLocation...";
             // 
+            // button1
+            // 
+            button1.Location = new Point(321, 238);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 5;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
             ClientSize = new Size(611, 390);
+            Controls.Add(button1);
             Controls.Add(savePath);
             Controls.Add(ConvertButton);
             Controls.Add(inputPath);
@@ -128,6 +140,7 @@
         private TextBox savePath;
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
+        private Button button1;
     }
 }
 
