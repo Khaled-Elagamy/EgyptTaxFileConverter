@@ -237,10 +237,10 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="border-bottom:none; font-weight: 700!important;" class="formatted-amount">
+                    <td style="border-bottom:none; font-weight: 1000!important;" class="formatted-amount">
                         <b>{{D.totalAmount}}</b>
                     </td>
-                    <td style="border-bottom:none;">
+                    <td style="border-bottom:none; font-weight: 1000!important;">
                         <b>اجمالي المبلغ (ج.م)<br></b>
                     </td>
                 </tr>
@@ -262,8 +262,9 @@
     </div>
     <script>
         // Define a custom function to format numeric values
-        function formatNumericValue(value, decimalPlaces) {
-            var formattedValue = value.toFixed(decimalPlaces);
+        function formatNumericValue(value) {
+            //var formattedValue = value.toFixed(decimalPlaces);
+            var formattedValue = value.toLocaleString('ar-EG');
             var parts = formattedValue.split(".");
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             return parts.join(".");
@@ -275,7 +276,7 @@
             for (var i = 0; i < numericElements.length; i++) {
                 var numericValue = parseFloat(numericElements[i].textContent);
                 if (!isNaN(numericValue)) {
-                    formattedValue = formatNumericValue(numericValue, 3);
+                    formattedValue = formatNumericValue(numericValue);
                     var arabicFormattedValue = formattedValue.replace(/\d/g, function (digit) {
                         return String.fromCharCode(0x0660 + Number(digit));
                     });// 4 decimal places
