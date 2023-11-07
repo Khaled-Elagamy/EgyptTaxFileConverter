@@ -20,10 +20,6 @@ namespace Converter
 		private async void Form1_Load(object sender, EventArgs e)
 		{
 #if !DEBUG
-			using (var mgr = new UpdateManager("C:\\Projects\\MyApp\\Releases"))
-			{
-				await mgr.UpdateApp();
-			}
 			manager = await UpdateManager.GitHubUpdateManager(@"https://github.com/Khaled-Elagamy/EgyptTaxFileConverter");
 
 			var updateinfo = await manager.CheckForUpdate();
