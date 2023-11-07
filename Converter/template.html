@@ -115,7 +115,6 @@
         }
 
         th {
-            font-weight: 700;
             font-size: 10px;
             background-color: #C4C4C4;
             font-weight: 1000;
@@ -185,13 +184,13 @@
                 {{#D.invoiceLines}}
                 <tr>
                     <!--Make all the numbers double-->
-                    <td>
+                    <td class="formatted-amount">
                         {{netTotal}}
                     </td>
-                    <td>
+                    <td class="formatted-amount">
                         {{unitValue.amountEGP}}
                     </td>
-                    <td>
+                    <td class="formatted-amount">
                         {{quantity}}
                     </td>
                     <td style="max-width:160px">
@@ -209,28 +208,28 @@
                 </tr>
                 {{/D.invoiceLines}}
                 <tr>
-                    <td>{{D.totalSalesAmount}}</td>
+                    <td class="formatted-amount">{{D.totalSalesAmount}}</td>
                     <td>اجمالي المبيعات (ج.م)</td>
                 </tr>
                 <tr>
-                    <td>{{D.totalDiscountAmount}}</td>
+                    <td class="formatted-amount">{{D.totalDiscountAmount}}</td>
                     <td>اجمالي الخصم (ج.م)</td>
                 </tr>
                 <tr>
-                    <td>{{D.totalItemsDiscountAmount}}</td>
+                    <td class="formatted-amount">{{D.totalItemsDiscountAmount}}</td>
                     <td>اجمالي خصم الصنف (ج.م)</td>
                 </tr>
                 <tr>
                     <!--GET THE DATA FROM THE JSON FILES NOT STATIC IMPORTANT
                     https://sdk.invoicing.eta.gov.eg/files/TaxTypes.json-->
                     <!--to check the type of tax the second one is for the  T4-->
-                    <td>{{totalSalesAmount}}<br>
+                    <td class="formatted-amount">{{totalSalesAmount}}<br>
                         {{totalSalesAmount}}</td>
                     <td>ضريبة القيمة المضافة (ج.م)<br>
                         الخصم تحت حساب الضريبة(ج.م)</td>
                 </tr>
                 <tr>
-                    <td>
+                    <td class="formatted-amount">
                         {{D.extraDiscountAmount}}
                     </td>
                     <td>
@@ -238,7 +237,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="border-bottom:none;">
+                    <td style="border-bottom:none; font-weight: 700!important;" class="formatted-amount">
                         <b>{{D.totalAmount}}</b>
                     </td>
                     <td style="border-bottom:none;">
@@ -261,6 +260,31 @@
             the accuracy Of the
             .information shown here </div>
     </div>
+    <script>
+        // Define a custom function to format numeric values
+        function formatNumericValue(value, decimalPlaces) {
+            var formattedValue = value.toFixed(decimalPlaces);
+            var parts = formattedValue.split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        // Call the formatting function when the page loads
+        window.onload = function () {
+            var numericElements = document.getElementsByClassName("formatted-amount");
+            for (var i = 0; i < numericElements.length; i++) {
+                var numericValue = parseFloat(numericElements[i].textContent);
+                if (!isNaN(numericValue)) {
+                    formattedValue = formatNumericValue(numericValue, 3);
+                    var arabicFormattedValue = formattedValue.replace(/\d/g, function (digit) {
+                        return String.fromCharCode(0x0660 + Number(digit));
+                    });// 4 decimal places
+                    numericElements[i].textContent = arabicFormattedValue;
+                }
+            }
+        };
+    </script>
+
 </body>
 
 </html>
