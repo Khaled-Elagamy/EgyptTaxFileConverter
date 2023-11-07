@@ -8,10 +8,12 @@ namespace Converter
 {
 	public partial class Form1 : Form
 	{
-		private string template_path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "\\template.html";
+		private string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+		private string template_path;
 		UpdateManager manager;
 		public Form1()
 		{
+			template_path = Path.Combine(directory, "template.html");
 			InitializeComponent();
 			Load += Form1_Load;
 		}
@@ -105,7 +107,7 @@ namespace Converter
 		{
 			string jsonString = File.ReadAllText(jsonFilePath, Encoding.UTF8);
 			InvoiceModel invoiceData = JsonConvert.DeserializeObject<InvoiceModel>(jsonString);
-			DocumentModel? document = JsonConvert.DeserializeObject<DocumentModel>(invoiceData.document);
+			DocumentModel document = JsonConvert.DeserializeObject<DocumentModel>(invoiceData.document);
 			invoiceData.Documents = document;
 			if (invoiceData != null && document != null)
 			{
