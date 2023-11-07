@@ -10,27 +10,45 @@ namespace Converter
 	{
 		private string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 		private string template_path;
-		UpdateManager manager;
 		public Form1()
 		{
 			template_path = Path.Combine(directory, "template.html");
 			InitializeComponent();
-			this.Load += Form1_Load;
 		}
 		private async void Form1_Load(object sender, EventArgs e)
 		{
-#if !DEBUG
-			manager = await UpdateManager.GitHubUpdateManager(@"https://github.com/Khaled-Elagamy/EgyptTaxFileConverter");
-
-			var updateinfo = await manager.CheckForUpdate();
-			this.Text += $"V {manager.CurrentlyInstalledVersion().ToString()}";
-			if (updateinfo.ReleasesToApply.Count > 0)
+			try
 			{
-				label1.Text = "New update Avaliable \nThe app will be Updated after restart";
-				label1.Show();
-				await manager.UpdateApp();
+				using (var manager = await UpdateManager.GitHubUpdateManager(@"https://github.com/Khaled-Elagamy/EgyptTaxFileConverter", "Converter"))
+				{
+					// Disable update check when in develop mode.
+					if (!manager.IsInstalledApp)
+					{
+						return;
+					}
+					var updateinfo = await manager.CheckForUpdate();
+					if (updateinfo == null)
+					{
+						this.Text += " V. Latest Version";
+					}
+					else
+					{
+						this.Text += $" V. {manager.CurrentlyInstalledVersion()}";
+						if (updateinfo.ReleasesToApply.Count > 1)
+						{
+							label1.Text = "New update Avaliable \nThe app will be Updated after restart";
+							label1.Show();
+							await manager.UpdateApp();
+							//UpdateManager.RestartApp();
+						}
+					}
+				}
 			}
-#endif
+			catch (Exception ex)
+			{
+				this.Text += ex;
+			}
+
 		}
 		private void browseButton_Click(object sender, EventArgs e)
 		{
