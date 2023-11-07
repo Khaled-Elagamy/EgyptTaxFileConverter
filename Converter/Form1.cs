@@ -15,19 +15,26 @@ namespace Converter
 		{
 			template_path = Path.Combine(directory, "template.html");
 			InitializeComponent();
-			Load += Form1_Load;
+			this.Load += Form1_Load;
 		}
-		private async void Form1_Load()
+		private async void Form1_Load(object sender, EventArgs e)
 		{
+#if !DEBUG
+			using (var mgr = new UpdateManager("C:\\Projects\\MyApp\\Releases"))
+			{
+				await mgr.UpdateApp();
+			}
 			manager = await UpdateManager.GitHubUpdateManager(@"https://github.com/Khaled-Elagamy/EgyptTaxFileConverter");
+
 			var updateinfo = await manager.CheckForUpdate();
-			this.Text += manager.CurrentlyInstalledVersion().ToString();
+			this.Text += $"V {manager.CurrentlyInstalledVersion().ToString()}";
 			if (updateinfo.ReleasesToApply.Count > 0)
 			{
 				label1.Text = "New update Avaliable \nThe app will be Updated after restart";
 				label1.Show();
 				await manager.UpdateApp();
 			}
+#endif
 		}
 		private void browseButton_Click(object sender, EventArgs e)
 		{
@@ -209,10 +216,7 @@ namespace Converter
 			}
 		}
 
-		private void Form1_Load(object sender, EventArgs e)
-		{
 
-		}
 
 
 
