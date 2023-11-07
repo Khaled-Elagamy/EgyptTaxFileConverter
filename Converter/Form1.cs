@@ -8,11 +8,8 @@ namespace Converter
 {
 	public partial class Form1 : Form
 	{
-		private string directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-		private string template_path;
 		public Form1()
 		{
-			template_path = Path.Combine(directory, "template.html");
 			InitializeComponent();
 		}
 		private async void Form1_Load(object sender, EventArgs e)
@@ -71,7 +68,6 @@ namespace Converter
 		}
 		private void ConvertButton_Click(object sender, EventArgs e)
 		{
-			Check_Tempelate(template_path);
 			string directoryPath = Path.GetDirectoryName(openFileDialog.FileName);
 			using (saveFileDialog)
 			{
@@ -94,31 +90,51 @@ namespace Converter
 				DeserializeJson(inputPath.Text);
 			}
 		}
-		private void Check_Tempelate(string template_path)
+		private string Get_html_data()
 		{
+			string template_path = Path.Combine(Directory.GetCurrentDirectory(), "template.html");
+			string htmlContent;
+			//check template auto
 			if (template_html.FileName == "" && File.Exists(template_path))
 			{
 				template_html.FileName = template_path;
 			}
-			else if (!File.Exists(template_path))
+			//ccheck template manual
+			if (File.Exists(template_html.FileName))
 			{
-				MessageBox.Show("The HtmlTemplate file does not exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				label1.Text = "Can't find file" + template_path;
-				label2.Text = "Click to Choose File";
-				Get_html_file();
+				label2.Text = "using File";
+				htmlContent = File.ReadAllText(template_html.FileName);
+				return htmlContent;
 			}
-
+			else
+			{
+				label2.Text = "using resources";
+				var assembly = Assembly.GetExecutingAssembly();
+				var resourceStream = assembly.GetManifestResourceStream("Converter.template.html");
+				if (resourceStream != null)
+				{
+					using (var reader = new StreamReader(resourceStream))
+					{
+						htmlContent = reader.ReadToEnd();
+						return htmlContent;
+					}
+				}
+				else
+				{
+					return null;
+				}
+			}
 		}
 		private void Get_html_file()
 		{
 			using (template_html)
 			{
+				template_html.InitialDirectory = Directory.GetCurrentDirectory();
 				template_html.Filter = "Html files (*.html)|*.html";
 				//openFileDialog.Filter = "JSON Files (*.json)|*.json|XML Files (*.xml)|*.xml";
 				if (template_html.ShowDialog() == DialogResult.OK)
 				{
 					string selectedFileName = Path.GetFileName(template_html.FileName);
-					template_path = template_html.FileName;
 					label1.Text = "Creating Pdf File using " + selectedFileName;
 					label2.Text = "Click here to change the file";
 				}
@@ -132,7 +148,7 @@ namespace Converter
 			invoiceData.Documents = document;
 			if (invoiceData != null && document != null)
 			{
-				htmltopdf(template_html.FileName, saveFileDialog.FileName, invoiceData, document);
+				htmltopdf(saveFileDialog.FileName, invoiceData, document);
 			}
 			else
 			{
@@ -141,7 +157,7 @@ namespace Converter
 			}
 		}
 
-		private void htmltopdf(string templatePath, string outputPath, InvoiceModel invoice, DocumentModel document)
+		private void htmltopdf(string outputPath, InvoiceModel invoice, DocumentModel document)
 		{
 			/*
             // JSON data for the invoice
@@ -215,7 +231,21 @@ namespace Converter
 			}
 			try
 			{
-				string htmlTemplate = File.ReadAllText(templatePath);
+				string htmlTemplate = Get_html_data();
+				if (htmlTemplate == null)
+				{
+					string message = "Error reading html file. Please Choose one manually\nYou Can Download it from here";
+					string linkText = "Download";
+					string linkUrl = "https://github.com/Khaled-Elagamy/EgyptTaxFileConverter/blob/main/Converter/template.html"; // Replace with the actual URL
+
+					using (var customMessageBox = new CustomMessageBox(message, linkText, linkUrl))
+					{
+						customMessageBox.ShowDialog();
+					}
+					Get_html_file();
+					htmlTemplate = File.ReadAllText(template_html.FileName);
+				}
+				//string htmlTemplate = File.ReadAllText(templatePath);
 				string renderedHtml = Render.StringToString(htmlTemplate, combinedData);
 				PdfGenerator.GeneratePdf(renderedHtml, outputPath);
 				savePath.Clear();

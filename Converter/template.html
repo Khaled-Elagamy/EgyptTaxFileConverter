@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Mada:wght@300;700&display=swap"
+        rel="stylesheet">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+            text-align: right;
+            font-size: 14px;
+            overflow-wrap: break-word;
+            /* Specify your desired font, such as an Arabic font */
+        }
+
+        .border {
+            border: 1px solid #808080;
+        }
+
+        .invoice-container {
+            width: 11.03in;
+            /* Set the width to match the PDF width */
+            height: 15.58in;
+            font-family: tahoma !important;
+            margin: 0 auto;
+            line-height: 20px;
+            /* Adjust the line height as needed */
+
+        }
+
+        .invoice-header h1 {
+            font-family: 'Mada', sans-serif;
+            color: #333;
+        }
+
+        .invoice-header {
+            color: #696666;
+            margin-bottom: 70px;
+        }
+
+        .seller {
+            width: 70%;
+            margin-left: auto;
+            margin-right: 0;
+            font-weight: 1000;
+        }
+
+        .seller-block {
+            color: white;
+            background-color: #3F5161;
+            padding: 5px;
+            font-weight: 700 !important;
+        }
+
+        .seller-info {
+            color: #333;
+            padding: 5px;
+            margin-bottom: 50px;
+            font-weight: 700 !important;
+        }
+
+        .customer-block {
+            padding: 5px;
+            margin: 8px 0px 8px;
+            border-right: none;
+            color: black;
+            background-color: #C4C4C4;
+            padding: 5px;
+            font-weight: 700 !important;
+        }
+
+        .customer-info {
+            color: #333;
+            padding: 7px;
+        }
+
+        .border-box-header {
+            padding: 7px;
+            width: 75%;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .border-box {
+            width: 100%;
+            margin: 0 0 70px auto;
+            border-left: none;
+        }
+
+        table {
+            max-width: 100%;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #808080;
+            padding: 5px;
+            padding-right: 7px;
+            word-wrap: normal;
+            direction: rtl;
+            margin-right: 3px;
+            line-height: 20px;
+        }
+
+        td {
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        th {
+            font-weight: 700;
+            font-size: 10px;
+            background-color: #C4C4C4;
+            font-weight: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>فاتورة</h1>
+            الحالة : <b>{{I.status}}</b><br>
+            {{I.dateTimeIssued}} : تاريخ التقديم <br>
+            {{I.dateTimeReceived}} :تاريخ الإصدار<br>
+        </div>
+        <div class="seller">
+            <div class="seller-block">
+                البائع
+            </div>
+            <div class="seller-info">
+
+                {{I.issuerName}}<br>
+                <div style="float:left; text-align: left; ">
+                    :كود النشاط الضريبي<br>
+                    {{D.taxpayerActivityCode}}
+                </div>
+                {{I.issuerId}} # رقم التسجيل <br>
+                رقم الفرع:{{D.issuer.address.branchID}},
+                {{D.issuer.address.street}},
+                {{D.issuer.address.governate}},{{D.issuer.address.postalCode}}<br>
+                {{D.issuer.address.country}},{{D.issuer.address.regionCity}}
+            </div>
+        </div>
+        <div class="border-box border">
+            <div class="border-box-header">
+
+                <div style="float:left;">
+                    {{s}} :رقم الفاتورة المبدئية للتصدير<br>
+                    {{s}} :رقم أمر البيع <br>
+                </div>
+                {{I.uuid}}
+                <b>: الرقم الالكتروني</b><br>
+                {{I.additionalMetadata.fieldNameDescAr}}
+                <b>: مرجع طلب الشراء</b><br>
+
+            </div>
+
+            <div class="customer-block border">المشتري</div>
+            <div class="customer-info">
+                {{D.receiver.name}}
+                <b>: الاسم</b>
+                <br>
+                <b> {{D.receiver.Id}}# رقم التسجيل </b><br>
+                {{D.receiver.address.street}},
+                {{D.receiver.address.governate}},{{D.receiver.address.postalCode}} <br>
+                {{D.receiver.address.country}},{{D.receiver.address.regionCity}}
+            </div>
+            <table>
+                <tr>
+                    <th style="min-width: 140px;">قيمة المبيعات (ج.م)</th>
+                    <th style=" min-width: 170px;"> سعر الوحدة (ج.م)</th>
+                    <th style="min-width: 80px">الكمية</th>
+                    <th>الوصف</th>
+                    <th style="min-width: 120px; padding-left: 20px;">كود الصنف</th>
+                    <th style="border-left:none;min-width: 50px;">اسم الكود</th>
+                </tr>
+                {{#D.invoiceLines}}
+                <tr>
+                    <!--Make all the numbers double-->
+                    <td>
+                        {{netTotal}}
+                    </td>
+                    <td>
+                        {{unitValue.amountEGP}}
+                    </td>
+                    <td>
+                        {{quantity}}
+                    </td>
+                    <td style="max-width:160px">
+                        <!--Description-->
+                        {{description}}
+                    </td>
+                    <td>
+                        {{itemType}} - {{itemCode}}
+                    </td>
+                    <td style="border-left:none;">
+                        <!--Name-->
+                        <!--remember if the description has a part of the name of hte issuer remove it in the base file-->
+                        {{description}}
+                    </td>
+                </tr>
+                {{/D.invoiceLines}}
+                <tr>
+                    <td>{{D.totalSalesAmount}}</td>
+                    <td>اجمالي المبيعات (ج.م)</td>
+                </tr>
+                <tr>
+                    <td>{{D.totalDiscountAmount}}</td>
+                    <td>اجمالي الخصم (ج.م)</td>
+                </tr>
+                <tr>
+                    <td>{{D.totalItemsDiscountAmount}}</td>
+                    <td>اجمالي خصم الصنف (ج.م)</td>
+                </tr>
+                <tr>
+                    <!--GET THE DATA FROM THE JSON FILES NOT STATIC IMPORTANT
+                    https://sdk.invoicing.eta.gov.eg/files/TaxTypes.json-->
+                    <!--to check the type of tax the second one is for the  T4-->
+                    <td>{{totalSalesAmount}}<br>
+                        {{totalSalesAmount}}</td>
+                    <td>ضريبة القيمة المضافة (ج.م)<br>
+                        الخصم تحت حساب الضريبة(ج.م)</td>
+                </tr>
+                <tr>
+                    <td>
+                        {{D.extraDiscountAmount}}
+                    </td>
+                    <td>
+                        خصم الفاتورة الاضافي (ج.م)<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-bottom:none;">
+                        <b>{{D.totalAmount}}</b>
+                    </td>
+                    <td style="border-bottom:none;">
+                        <b>اجمالي المبلغ (ج.م)<br></b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            {{I.internalId}} :الرقم الداخلي
+        </div>
+        <div style="float:left; text-align: left; color: #B5BBD0; ">
+            {{timeZone}} النوقيت العالمي,{{currentTime}} تاريخ انشاء الملف
+        </div>
+        <div style="float:left; text-align: right; color: #ADA0B8; font-size: 9px;">
+            Standard footer discalimer to be written. This invoice has been generated via the Egyptian Tax Authority
+            (ETA)
+            Invoicing portal and you are bound by the Terms & Conditions Of this portal. The ETA take no responsibility
+            for
+            the accuracy Of the
+            .information shown here </div>
+    </div>
+</body>
+
+</html>
