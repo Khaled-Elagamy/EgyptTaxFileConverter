@@ -24,21 +24,15 @@ namespace Converter
 						return;
 					}
 					var updateinfo = await manager.CheckForUpdate();
-					if (updateinfo == null)
-					{
-						this.Text += " V. Latest Version";
+					if (updateinfo.ReleasesToApply.Count > 0)
+					{   //Handele if the version is deleted
+						this.Text += $" V.{manager.CurrentlyInstalledVersion()}";
+						label1.Text = "New update Avaliable \nThe app will be Updated after restart";
+						label1.Show();
+						await manager.UpdateApp();
+						//UpdateManager.RestartApp();
 					}
-					else
-					{
-						this.Text += $" V. {manager.CurrentlyInstalledVersion()}";
-						if (updateinfo.ReleasesToApply.Count > 1)
-						{
-							label1.Text = "New update Avaliable \nThe app will be Updated after restart";
-							label1.Show();
-							await manager.UpdateApp();
-							//UpdateManager.RestartApp();
-						}
-					}
+					else { this.Text += " Latest Version"; }
 				}
 			}
 			catch (Exception ex)
@@ -102,13 +96,11 @@ namespace Converter
 			//ccheck template manual
 			if (File.Exists(template_html.FileName))
 			{
-				label2.Text = "using File";
 				htmlContent = File.ReadAllText(template_html.FileName);
 				return htmlContent;
 			}
 			else
 			{
-				label2.Text = "using resources";
 				var assembly = Assembly.GetExecutingAssembly();
 				var resourceStream = assembly.GetManifestResourceStream("Converter.template.html");
 				if (resourceStream != null)
@@ -160,29 +152,29 @@ namespace Converter
 		private void htmltopdf(string outputPath, InvoiceModel invoice, DocumentModel document)
 		{
 			/*
-            // JSON data for the invoice
-            var invoiceData = new
-            {
-                status = invoice.status,
-                dateTimeIssued = invoice.dateTimeIssued,
-                dateTimeReceived = invoice.dateTimeReceived,
-                issuerName = invoice.issuerName,
-                uuid = invoice.uuid,
-                taxpayerActivityCode = document.taxpayerActivityCode,
-                issuerId = invoice.issuerId,
-                postalCode = document.issuer.address.postalCode,
-                street = document.issuer.address.street,
-                branchID = document.issuer.address.branchID,
-                country = document.issuer.address.country,
-                regionCity = document.issuer.address.regionCity,
-                floor = document.issuer.address.floor,
-                CustomerName = document.receiver.name,
-                room = document.issuer.address.room,
-                buildingnumber = document.issuer.address.buildingNumber,
+			// JSON data for the invoice
+			var invoiceData = new
+			{
+				status = invoice.status,
+				dateTimeIssued = invoice.dateTimeIssued,
+				dateTimeReceived = invoice.dateTimeReceived,
+				issuerName = invoice.issuerName,
+				uuid = invoice.uuid,
+				taxpayerActivityCode = document.taxpayerActivityCode,
+				issuerId = invoice.issuerId,
+				postalCode = document.issuer.address.postalCode,
+				street = document.issuer.address.street,
+				branchID = document.issuer.address.branchID,
+				country = document.issuer.address.country,
+				regionCity = document.issuer.address.regionCity,
+				floor = document.issuer.address.floor,
+				CustomerName = document.receiver.name,
+				room = document.issuer.address.room,
+				buildingnumber = document.issuer.address.buildingNumber,
 
-                // Add more data as needed
-            };
-            */
+				// Add more data as needed
+			};
+			*/
 			/*Create new file with data formatting*/
 			switch (invoice.status.ToLower())
 			{

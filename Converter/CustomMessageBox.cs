@@ -48,7 +48,7 @@ namespace Converter
 		private void DownloadButton_Click(object sender, EventArgs e)
 		{
 			// Specify the URL of the HTML file in the GitHub repository
-			string githubHtmlUrl = "https://github.com/Khaled-Elagamy/EgyptTaxFileConverter/blob/main/template.html"; // Replace with the actual URL
+			string githubHtmlUrl = "https://github.com/Khaled-Elagamy/EgyptTaxFileConverter/blob/main/Converter/template.html"; // Replace with the actual URL
 
 			// Create a WebClient to download the file
 			using (WebClient webClient = new WebClient())
@@ -63,7 +63,6 @@ namespace Converter
 
 					// Display a success message
 					MessageBox.Show("HTML file downloaded successfully.", "Download Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-					Close();
 				}
 				catch (Exception ex)
 				{
