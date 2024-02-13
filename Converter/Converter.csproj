@@ -21,7 +21,7 @@
 		<PackageReference Include="DinkToPdf" Version="1.0.8" />
 		<PackageReference Include="iTextSharp" Version="5.5.13.3" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="NuGet.CommandLine" Version="6.7.0">
+		<PackageReference Include="NuGet.CommandLine" Version="6.8.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
